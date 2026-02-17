@@ -2,33 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Download } from "./ui/Icons";
 import { Button } from "./ui/Button";
 import { appStore } from "@/lib/store";
-
-const PlayingWaveform = ({
-  audioLoaded,
-  amplitudeLevels,
-}: {
-  audioLoaded: boolean;
-  amplitudeLevels: number[];
-}) => (
-  <div className="w-[36px] h-[16px] relative left-[4px]">
-    {amplitudeLevels.map((level, idx) => {
-      const height = `${Math.min(Math.max(level * 30, 0.2), 1.9) * 100}%`;
-      return (
-        <div
-          key={idx}
-          className={`w-[2px] bg-white transition-all duration-150 rounded-[2px] absolute top-1/2 -translate-y-1/2 ${
-            audioLoaded ? "opacity-100" : "animate-wave"
-          }`}
-          style={{
-            height,
-            animationDelay: `${idx * 0.15}s`,
-            left: `${idx * 6}px`,
-          }}
-        />
-      );
-    })}
-  </div>
-);
+import { PlayingWaveform } from "./PlayingWaveform";
+import { downloadFile } from "@/lib/downloadFile";
 
 const IS_CHROME =
   // @ts-expect-error - it's a safe reach
@@ -94,12 +69,7 @@ export default function DownloadButton() {
 
       const res = await fetch("/api/generate", { method: "POST", body: form });
       const blob = await res.blob();
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      downloadFile(URL.createObjectURL(blob), filename);
       setLoading(false);
       return;
     }
@@ -111,12 +81,7 @@ export default function DownloadButton() {
       const handler = (e: MessageEvent) => {
         if (e.data.type === "ADD_TO_CACHE" && e.data.url === storeUrl) {
           navigator.serviceWorker.removeEventListener("message", handler);
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(e.data.blob);
-          link.download = filename;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+          downloadFile(URL.createObjectURL(e.data.blob), filename);
           setLoading(false);
         }
       };
@@ -124,12 +89,7 @@ export default function DownloadButton() {
       return;
     }
 
-    const link = document.createElement("a");
-    link.href = dataUrl;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadFile(dataUrl, filename);
   };
 
   return (

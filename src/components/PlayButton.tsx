@@ -2,37 +2,11 @@ import React, { useState, useRef } from "react";
 import { Play } from "./ui/Icons";
 import { Button } from "./ui/Button";
 import { appStore } from "@/lib/store";
+import { PlayingWaveform } from "./PlayingWaveform";
 import s from "./ui/Footer.module.css";
 
 const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-const PlayingWaveform = ({
-  audioLoaded,
-  amplitudeLevels,
-}: {
-  audioLoaded: boolean;
-  amplitudeLevels: number[];
-}) => (
-  <div className="w-[36px] h-[16px] relative left-[4px]">
-    {amplitudeLevels.map((level, idx) => {
-      const height = `${Math.min(Math.max(level * 30, 0.2), 1.9) * 100}%`;
-      return (
-        <div
-          key={idx}
-          className={`w-[2px] bg-white transition-all duration-150 rounded-[2px] absolute top-1/2 -translate-y-1/2 ${
-            audioLoaded ? "opacity-100" : s["animate-wave"]
-          }`}
-          style={{
-            height,
-            animationDelay: `${idx * 0.15}s`,
-            left: `${idx * 6}px`,
-          }}
-        />
-      );
-    })}
-  </div>
-);
 
 export default function PlayButton() {
   const [audioLoading, setAudioLoading] = useState(false);
@@ -170,11 +144,13 @@ export default function PlayButton() {
         <PlayingWaveform
           audioLoaded={audioLoaded}
           amplitudeLevels={amplitudeLevels}
+          animateWaveClass={s["animate-wave"]}
         />
       ) : audioLoading ? (
         <PlayingWaveform
           audioLoaded={false}
           amplitudeLevels={[0.032, 0.032, 0.032, 0.032, 0.032]}
+          animateWaveClass={s["animate-wave"]}
         />
       ) : (
         <Play />

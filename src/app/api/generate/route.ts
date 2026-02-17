@@ -1,4 +1,5 @@
-import { NextRequest, userAgent } from "next/server";
+import { NextRequest } from "next/server";
+import { getResponseFormat, buildSpeechApiPayload } from "@/lib/apiHelpers";
 
 export const MAX_INPUT_LENGTH = 1000;
 export const MAX_PROMPT_LENGTH = 1000;
@@ -9,8 +10,7 @@ import { VOICES } from "@/lib/library";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
 
-  const ua = userAgent(req);
-  const response_format = ua.engine?.name === "Blink" ? "wav" : "mp3";
+  const response_format = getResponseFormat(req);
 
   // Get parameters from the query string
   let input = searchParams.get("input") || "";
@@ -35,14 +35,7 @@ export async function GET(req: NextRequest) {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "gpt-4o-mini-tts",
-        input,
-        response_format,
-        voice,
-        // Don't pass if empty
-        ...(prompt && { instructions: prompt }),
-      }),
+      body: buildSpeechApiPayload(input, voice, response_format, prompt),
     });
     if (!apiResponse.ok) {
       return new Response(`An error occurred while generating the audio.`, {
@@ -69,8 +62,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const ua = userAgent(req);
-  const response_format = ua.engine?.name === "Blink" ? "wav" : "mp3";
+  const response_format = getResponseFormat(req);
 
   const formData = await req.formData();
   let input = formData.get("input")?.toString() || "";
@@ -95,14 +87,7 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "gpt-4o-mini-tts",
-        input,
-        response_format,
-        voice,
-        // Don't pass if empty
-        ...(prompt && { instructions: prompt }),
-      }),
+      body: buildSpeechApiPayload(input, voice, response_format, prompt),
     });
     if (!apiResponse.ok) {
       return new Response(`An error occurred while generating the audio.`, {
