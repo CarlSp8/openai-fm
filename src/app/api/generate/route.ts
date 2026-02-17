@@ -6,11 +6,11 @@ export const MAX_PROMPT_LENGTH = 1000;
 // GET handler that proxies requests to the OpenAI TTS API and streams
 // the response back to the client.
 import { VOICES } from "@/lib/library";
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
 
-  const ua = userAgent(req);
-  const response_format = ua.engine?.name === "Blink" ? "wav" : "mp3";
+  const userAgentInfo = userAgent(request);
+  const response_format = userAgentInfo.engine?.name === "Blink" ? "wav" : "mp3";
 
   // Get parameters from the query string
   let input = searchParams.get("input") || "";
@@ -60,19 +60,19 @@ export async function GET(req: NextRequest) {
         "Cache-Control": "no-cache",
       },
     });
-  } catch (err) {
-    console.error("Error generating speech:", err);
+  } catch (error) {
+    console.error("Error generating speech:", error);
     return new Response("Error generating speech", {
       status: 500,
     });
   }
 }
 
-export async function POST(req: NextRequest) {
-  const ua = userAgent(req);
-  const response_format = ua.engine?.name === "Blink" ? "wav" : "mp3";
+export async function POST(request: NextRequest) {
+  const userAgentInfo = userAgent(request);
+  const response_format = userAgentInfo.engine?.name === "Blink" ? "wav" : "mp3";
 
-  const formData = await req.formData();
+  const formData = await request.formData();
   let input = formData.get("input")?.toString() || "";
   let prompt = formData.get("prompt")?.toString() || "";
   const voice = formData.get("voice")?.toString() || "";
@@ -120,8 +120,8 @@ export async function POST(req: NextRequest) {
         "Cache-Control": "no-cache",
       },
     });
-  } catch (err) {
-    console.error("Error generating speech:", err);
+  } catch (error) {
+    console.error("Error generating speech:", error);
     return new Response("Error generating speech", {
       status: 500,
     });

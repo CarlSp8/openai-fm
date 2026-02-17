@@ -115,10 +115,10 @@ export default function PlayButton() {
           return;
         }
         if (!analyserRef.current) return;
-        const data = new Uint8Array(analyserRef.current.fftSize);
-        analyserRef.current.getByteTimeDomainData(data);
+        const audioData = new Uint8Array(analyserRef.current.fftSize);
+        analyserRef.current.getByteTimeDomainData(audioData);
         const avg =
-          data.reduce((sum, v) => sum + Math.abs(v - 128), 0) /
+          audioData.reduce((sum, sample) => sum + Math.abs(sample - 128), 0) /
           analyserRef.current.fftSize;
         const amp = avg / 128;
         setAmplitudeLevels((prev) => [...prev.slice(1), amp]);
@@ -151,8 +151,8 @@ export default function PlayButton() {
       audio.onended = clearSampling;
       audio.autoplay = true;
       audio.src = audioUrl;
-    } catch (err) {
-      console.error("Error generating speech:", err);
+    } catch (error) {
+      console.error("Error generating speech:", error);
       setAudioLoading(false);
       setAudioLoaded(false);
       setIsPlaying(false);
