@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ id });
   } catch (error) {
     console.error("Error storing share params:", error);
-    return new Response("An error ocurred.", { status: 500 });
+    return new Response("An error occurred.", { status: 500 });
   }
 }
 
@@ -37,6 +37,6 @@ export async function GET(request: NextRequest) {
     return Response.json(rows[0]);
   } catch (error) {
     console.error("Error retrieving share params:", error);
-    return new Response("An error ocurred.", { status: 500 });
+    return new Response("An error occurred.", { status: 500 });
   }
 }
