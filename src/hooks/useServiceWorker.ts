@@ -10,7 +10,7 @@ export interface SWMessage {
 export function useServiceWorker(scriptURL: string) {
   const [registration, setRegistration] =
     useState<ServiceWorkerRegistration | null>(null);
-  const messageHandlers = useRef<Set<(msg: SWMessage) => void>>(new Set());
+  const messageHandlers = useRef<Set<(message: SWMessage) => void>>(new Set());
 
   // Register service‐worker
   useEffect(() => {
@@ -22,7 +22,7 @@ export function useServiceWorker(scriptURL: string) {
       .then((reg) => {
         if (mounted) setRegistration(reg);
       })
-      .catch((err) => console.error("SW registration failed", err));
+      .catch((error) => console.error("SW registration failed", error));
 
     return () => {
       mounted = false;
@@ -43,7 +43,7 @@ export function useServiceWorker(scriptURL: string) {
   }, []);
 
   // Subscribe to SW messages
-  const onSWMessage = (handler: (msg: SWMessage) => void) => {
+  const onSWMessage = (handler: (message: SWMessage) => void) => {
     messageHandlers.current.add(handler);
     return () => {
       messageHandlers.current.delete(handler);

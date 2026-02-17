@@ -51,20 +51,20 @@ class AppStore {
     }
 
     fetch(`/api/share?hash=${hash}`)
-      .then((res) => {
-        if (!res.ok) {
+      .then((response) => {
+        if (!response.ok) {
           return null;
         }
-        return res.json();
+        return response.json();
       })
-      .then((data) => {
-        if (data) {
+      .then((sharedParams) => {
+        if (sharedParams) {
           this.store.setState((draft) => {
-            draft.input = data.input;
-            draft.prompt = data.prompt;
-            draft.voice = data.voice;
+            draft.input = sharedParams.input;
+            draft.prompt = sharedParams.prompt;
+            draft.voice = sharedParams.voice;
 
-            const maybeSpecificVibe = getLibraryByPrompt(data.prompt);
+            const maybeSpecificVibe = getLibraryByPrompt(sharedParams.prompt);
             if (maybeSpecificVibe) {
               const exists = draft.librarySet.find(
                 (lib) => lib.prompt === maybeSpecificVibe.prompt
@@ -77,8 +77,8 @@ class AppStore {
           });
         }
       })
-      .catch((err) => {
-        console.error("Error loading shared params:", err);
+      .catch((error) => {
+        console.error("Error loading shared params:", error);
       });
   }
 

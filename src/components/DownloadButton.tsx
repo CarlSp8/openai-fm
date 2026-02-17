@@ -33,7 +33,7 @@ const PlayingWaveform = ({
 const IS_CHROME =
   // @ts-expect-error - it's a safe reach
   navigator.userAgentData?.brands?.some(
-    (b: { brand: string }) => b.brand === "Google Chrome"
+    (brand: { brand: string }) => brand.brand === "Google Chrome"
   ) === true;
 
 export default function DownloadButton() {
@@ -45,9 +45,9 @@ export default function DownloadButton() {
     if (!latestAudioUrl) return;
 
     let objectUrl = "";
-    const handler = (e: MessageEvent) => {
-      if (e.data.type === "ADD_TO_CACHE" && e.data.url === latestAudioUrl) {
-        objectUrl = URL.createObjectURL(e.data.blob);
+    const handler = (event: MessageEvent) => {
+      if (event.data.type === "ADD_TO_CACHE" && event.data.url === latestAudioUrl) {
+        objectUrl = URL.createObjectURL(event.data.blob);
         setDataUrl(objectUrl);
       }
     };
@@ -65,7 +65,7 @@ export default function DownloadButton() {
       navigator.serviceWorker
         // update file name when updating the service worker to avoid cache issues
         .register("/worker-444eae9e2e1bdd6edd8969f319655e70.js")
-        .catch((err) => console.error("SW registration failed", err));
+        .catch((error) => console.error("SW registration failed", error));
     }
   }, []);
 
@@ -108,11 +108,11 @@ export default function DownloadButton() {
 
     if (!dataUrl) {
       setLoading(true);
-      const handler = (e: MessageEvent) => {
-        if (e.data.type === "ADD_TO_CACHE" && e.data.url === storeUrl) {
+      const handler = (event: MessageEvent) => {
+        if (event.data.type === "ADD_TO_CACHE" && event.data.url === storeUrl) {
           navigator.serviceWorker.removeEventListener("message", handler);
           const link = document.createElement("a");
-          link.href = URL.createObjectURL(e.data.blob);
+          link.href = URL.createObjectURL(event.data.blob);
           link.download = filename;
           document.body.appendChild(link);
           link.click();

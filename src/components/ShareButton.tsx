@@ -14,26 +14,26 @@ export const ShareButton = () => {
     const { input, prompt, voice } = appStore.getState();
 
     try {
-      const res = await fetch("/api/share", {
+      const response = await fetch("/api/share", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ input, prompt, voice }),
       });
-      if (!res.ok) {
+      if (!response.ok) {
         alert("Error sharing. Please try again.");
         return;
       }
-      const data = await res.json();
+      const data = await response.json();
       const hash = data.id;
       const shareUrl = `${window.location.origin}${window.location.pathname}#${hash}`;
       // Copy share URL to clipboard to share with others.
       await copyText(shareUrl);
       setShareUrl(shareUrl);
       setOpen(true);
-    } catch (err) {
-      console.error("Error creating share link:", err);
+    } catch (error) {
+      console.error("Error creating share link:", error);
       alert("Error creating share link. Please try again.");
     }
   };

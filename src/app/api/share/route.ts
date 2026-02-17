@@ -3,9 +3,9 @@ import { sql } from "@vercel/postgres";
 import { MAX_PROMPT_LENGTH, MAX_INPUT_LENGTH } from "../generate/route";
 
 // Saves shared links to the database
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const { input, prompt, voice } = await req.json();
+    const { input, prompt, voice } = await request.json();
     const clippedInput = input.slice(0, MAX_INPUT_LENGTH);
     const clippedPrompt = prompt.slice(0, MAX_PROMPT_LENGTH);
     const id = crypto.randomUUID();
@@ -13,15 +13,15 @@ export async function POST(req: NextRequest) {
       clippedInput ?? ""
     }, ${clippedPrompt ?? ""}, ${voice ?? ""});`;
     return Response.json({ id });
-  } catch (err) {
-    console.error("Error storing share params:", err);
+  } catch (error) {
+    console.error("Error storing share params:", error);
     return new Response("An error ocurred.", { status: 500 });
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const url = new URL(req.url);
+    const url = new URL(request.url);
     const hash = url.searchParams.get("hash");
     if (!hash) {
       return new Response("Not found", { status: 404 });
@@ -35,8 +35,8 @@ export async function GET(req: NextRequest) {
       return new Response("Not found", { status: 404 });
     }
     return Response.json(rows[0]);
-  } catch (err) {
-    console.error("Error retrieving share params:", err);
+  } catch (error) {
+    console.error("Error retrieving share params:", error);
     return new Response("An error ocurred.", { status: 500 });
   }
 }
